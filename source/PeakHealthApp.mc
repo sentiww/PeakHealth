@@ -1,6 +1,7 @@
 import Toybox.Application;
 import Toybox.Lang;
 import Toybox.WatchUi;
+import Toybox.Sensor;
 
 class PeakHealthApp extends Application.AppBase {
 
@@ -20,7 +21,6 @@ class PeakHealthApp extends Application.AppBase {
     function getInitialView() as [Views] or [Views, InputDelegates] {
         return [ new PeakHealthView(), new PeakHealthDelegate() ];
     }
-
 }
 
 function getApp() as PeakHealthApp {
