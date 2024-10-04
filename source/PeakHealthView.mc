@@ -1,17 +1,18 @@
 import Toybox.Graphics;
 import Toybox.WatchUi;
+import Toybox.UserProfile;
 
 class PeakHealthView extends WatchUi.View {
 
     hidden var oxygenSaturationText;
-    hidden var debugText;
+    hidden var aosText;
     hidden var updateCount;
 
     function initialize() {
         View.initialize();
         
         Sensor.setEnabledSensors([Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY]);
-        Sensor.enableSensorEvents(method(:onPulseOximetrySensor));
+        Sensor.enableSensorEvents(method(:onSensorEvents));
 
         updateCount = 0;
     }
@@ -26,15 +27,15 @@ class PeakHealthView extends WatchUi.View {
     // loading resources into memory.
     function onShow() as Void {
         oxygenSaturationText = new WatchUi.Text({
-            :text=>"",
+            :text=>"000",
             :color=>Graphics.COLOR_WHITE,
             :font=>Graphics.FONT_MEDIUM,
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
-            :locY=>WatchUi.LAYOUT_VALIGN_CENTER
+            :locY=>WatchUi.LAYOUT_VALIGN_TOP
         });
 
-        debugText = new WatchUi.Text({
-            :text=>"hi",
+        aosText = new WatchUi.Text({
+            :text=>"000",
             :color=>Graphics.COLOR_WHITE,
             :font=>Graphics.FONT_MEDIUM,
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
@@ -48,7 +49,7 @@ class PeakHealthView extends WatchUi.View {
         dc.clear();
 
         oxygenSaturationText.draw(dc);
-        debugText.draw(dc);
+        aosText.draw(dc);
     }
 
     // Called when this View is removed from the screen. Save the
@@ -57,8 +58,7 @@ class PeakHealthView extends WatchUi.View {
     function onHide() as Void {
     }
 
-
-    function onPulseOximetrySensor(sensorInfo) {
+    function onSensorEvents(sensorInfo) {
         if (sensorInfo == null) {
             System.println("SensorInfo was null");
             return;
@@ -71,18 +71,36 @@ class PeakHealthView extends WatchUi.View {
 
         System.println("Got pulseoximetry update");
 
+        var femaleModifier = 1.4;
+        var maleModifier = 0.7;
+        var unspecifiedModifier = (femaleModifier + maleModifier) / 2;  
+        var genderModifier = -1;
+        var userProfile = UserProfile.getProfile();
+        if (userProfile == null or userProfile.gender == null) {
+            genderModifier = unspecifiedModifier;
+        }
+        else if (userProfile.gender == UserProfile.GENDER_FEMALE) {
+            genderModifier = femaleModifier;
+        }
+        else if (userProfile.gender == UserProfile.GENDER_MALE) {
+            genderModifier = maleModifier;
+        }
+        System.println("Gender set correctly");
+
+        var altitude = sensorInfo.altitude;
+
+        var aos = 103.3 - (altitude * 0.0047) + (genderModifier);
+
         oxygenSaturationText = new WatchUi.Text({
             :text=>sensorInfo.oxygenSaturation.format("%02d"),
             :color=>Graphics.COLOR_WHITE,
             :font=>Graphics.FONT_MEDIUM,
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
-            :locY=>WatchUi.LAYOUT_VALIGN_CENTER
+            :locY=>WatchUi.LAYOUT_VALIGN_TOP
         });
 
-        updateCount = updateCount + 1;
-
-        debugText = new WatchUi.Text({
-            :text=>updateCount.format("%d"),
+        aosText = new WatchUi.Text({
+            :text=>aos.format("%02d"),
             :color=>Graphics.COLOR_WHITE,
             :font=>Graphics.FONT_MEDIUM,
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
