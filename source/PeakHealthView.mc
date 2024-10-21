@@ -3,17 +3,26 @@ import Toybox.WatchUi;
 import Toybox.UserProfile;
 import Toybox.Background;
 import Toybox.Time;
+import Toybox.Math;
+import EquationUtils;
+import MathUtils;
 
 class PeakHealthView extends WatchUi.View {
 
     hidden var oxygenSaturationText;
     hidden var aosText;
+    hidden var graph;
+    hidden var currentAltitude;
+    hidden var currentSaturation;
 
     function initialize() {
         View.initialize();
 
         Sensor.setEnabledSensors([Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY]);
         Sensor.enableSensorEvents(method(:onSensorEvents));
+
+        currentAltitude = 0;
+        currentSaturation = EquationUtils.getLinearTheoreticalSaturation(currentAltitude);
     }
 
     // Load your resources here
@@ -49,6 +58,21 @@ class PeakHealthView extends WatchUi.View {
 
         oxygenSaturationText.draw(dc);
         aosText.draw(dc);
+
+        dc.setAntiAlias(true);
+
+        graph = new AltitudeSaturationGraph({
+            :width=>dc.getWidth(),
+            :height=>dc.getHeight(),
+            :paddingX=>25,
+            :paddingY=>50,
+            //:currentAltitude=>1000,
+            //:currentSaturation=>95,
+            :currentAltitude=>currentAltitude,
+            :currentSaturation=>currentSaturation,
+            :altitudeWindow=>1000
+        });
+        graph.draw(dc);
     }
 
     // Called when this View is removed from the screen. Save the
@@ -58,6 +82,30 @@ class PeakHealthView extends WatchUi.View {
     }
 
     function onSensorEvents(sensorInfo) {
+        currentAltitude += 100;
+        currentSaturation = EquationUtils.getPolynomialTheoreticalSaturation(currentAltitude);
+        
+        var mockAos = EquationUtils.getLinearTheoreticalSaturation(currentAltitude);
+        mockAos = MathUtils.clamp(mockAos, 0, 100);
+
+        oxygenSaturationText = new WatchUi.Text({
+            :text=>currentSaturation.format("%02d"),
+            :color=>Graphics.COLOR_WHITE,
+            :font=>Graphics.FONT_MEDIUM,
+            :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
+            :locY=>WatchUi.LAYOUT_VALIGN_TOP
+        });
+
+        aosText = new WatchUi.Text({
+            :text=>mockAos.format("%02d"),
+            :color=>Graphics.COLOR_WHITE,
+            :font=>Graphics.FONT_MEDIUM,
+            :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
+            :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM
+        });
+        WatchUi.requestUpdate();
+        return;
+
         if (sensorInfo == null) {
             System.println("SensorInfo was null");
             return;
@@ -76,13 +124,13 @@ class PeakHealthView extends WatchUi.View {
             return;
         }
 
+        currentSaturation = oxygenSaturation;
+        currentAltitude = altitude;
+
         System.println("Got sensor update");
 
-        var genderModifier = getGenderModifier();
-
-        System.println("Gender set correctly");
-
-        var aos = 103.3 - (altitude * 0.0047) + (genderModifier);
+        var aos = EquationUtils.getLinearTheoreticalSaturation(altitude);
+        aos = MathUtils.clamp(aos, 0, 100);
 
         oxygenSaturationText = new WatchUi.Text({
             :text=>oxygenSaturation.format("%02d"),
@@ -101,25 +149,5 @@ class PeakHealthView extends WatchUi.View {
         });
 
         WatchUi.requestUpdate();
-    }
-    
-    function getGenderModifier() {
-        var femaleModifier = 1.4;
-        var maleModifier = 0.7;
-        var unspecifiedModifier = (femaleModifier + maleModifier) / 2;
-        
-        var userProfile = UserProfile.getProfile();
-        
-        if (userProfile == null or userProfile.gender == null) {
-            return unspecifiedModifier;
-        }
-        else if (userProfile.gender == UserProfile.GENDER_FEMALE) {
-            return femaleModifier;
-        }
-        else if (userProfile.gender == UserProfile.GENDER_MALE) {
-            return maleModifier;
-        }
-
-        return unspecifiedModifier;
     }
 }
