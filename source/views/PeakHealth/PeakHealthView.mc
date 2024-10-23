@@ -78,6 +78,8 @@ class PeakHealthView extends WatchUi.View {
             :height=>dc.getHeight(),
             :paddingX=>25,
             :paddingY=>50,
+            //:currentAltitude=>1000,
+            //:currentSaturation=>95,
             :currentAltitude=>currentAltitude,
             :currentSaturation=>currentSaturation,
             :altitudeWindow=>window,

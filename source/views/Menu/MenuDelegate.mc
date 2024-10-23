@@ -1,9 +1,8 @@
 import Toybox.Application.Storage;
-import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-class PeakHealthMenuDelegate extends WatchUi.Menu2InputDelegate {
+class MenuDelegate extends WatchUi.Menu2InputDelegate {
 
     function initialize() {
         Menu2InputDelegate.initialize();

@@ -20,22 +20,19 @@ class PeakHealthApp extends Application.AppBase {
         }
     }
 
-    // onStart() is called on application start up
     function onStart(state as Dictionary?) as Void {
     }
 
-    // onStop() is called when your application is exiting
     function onStop(state as Dictionary?) as Void {
     }
 
-    // Return the initial view of your application here
     function getInitialView() as [Views] or [Views, InputDelegates] {
         return [ new PeakHealthView(), new PeakHealthDelegate() ];
     }
 
     
     function getServiceDelegate() {
-        return [new PeakHealthServiceDelegate()];
+        return [new BackgroundServiceDelegate()];
     }
 }
 

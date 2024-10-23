@@ -2,7 +2,7 @@ import Toybox.Background;
 import Toybox.System;
 
 (:background)
-class PeakHealthServiceDelegate extends System.ServiceDelegate {
+class BackgroundServiceDelegate extends System.ServiceDelegate {
 
     function initialize() {
         ServiceDelegate.initialize();
