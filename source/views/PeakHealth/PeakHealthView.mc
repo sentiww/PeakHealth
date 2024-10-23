@@ -5,9 +5,9 @@ import Toybox.Background;
 import Toybox.Time;
 import Toybox.Math;
 import Toybox.Lang;
+import Toybox.Application.Storage;
 import EquationUtils;
 import MathUtils;
-import Toybox.Application.Storage;
 
 class PeakHealthView extends WatchUi.View {
 
