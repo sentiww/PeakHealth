@@ -70,7 +70,8 @@ class PeakHealthView extends WatchUi.View {
             //:currentSaturation=>95,
             :currentAltitude=>currentAltitude,
             :currentSaturation=>currentSaturation,
-            :altitudeWindow=>1000
+            :altitudeWindow=>1000,
+            :markerSize=>4
         });
         graph.draw(dc);
     }
@@ -87,7 +88,7 @@ class PeakHealthView extends WatchUi.View {
         
         var mockAos = EquationUtils.getLinearTheoreticalSaturation(currentAltitude);
         mockAos = MathUtils.clamp(mockAos, 0, 100);
-
+        
         oxygenSaturationText = new WatchUi.Text({
             :text=>currentSaturation.format("%02d"),
             :color=>Graphics.COLOR_WHITE,
@@ -95,7 +96,7 @@ class PeakHealthView extends WatchUi.View {
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
             :locY=>WatchUi.LAYOUT_VALIGN_TOP
         });
-
+        
         aosText = new WatchUi.Text({
             :text=>mockAos.format("%02d"),
             :color=>Graphics.COLOR_WHITE,

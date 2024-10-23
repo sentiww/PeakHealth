@@ -55,8 +55,8 @@ public module MathUtils {
         point as Point
     ) as Lang.Boolean {
         return topLeft.x < point.x and 
-               topLeft.y < point.y and
+               topLeft.y + 1 < point.y and
                bottomRight.x > point.x and
-               bottomRight.y > point.y;
+               bottomRight.y - 1 > point.y;
     } 
 }
