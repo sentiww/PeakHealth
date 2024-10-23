@@ -1,18 +1,19 @@
+import Toybox.Application.Storage;
+import Toybox.Graphics;
 import Toybox.Lang;
-import Toybox.System;
 import Toybox.WatchUi;
 
-class PeakHealthMenuDelegate extends WatchUi.MenuInputDelegate {
+class PeakHealthMenuDelegate extends WatchUi.Menu2InputDelegate {
 
     function initialize() {
-        MenuInputDelegate.initialize();
+        Menu2InputDelegate.initialize();
     }
 
-    function onMenuItem(item as Symbol) as Void {
-        if (item == :item_1) {
-            System.println("item 1");
-        } else if (item == :item_2) {
-            System.println("item 2");
+    function onSelect(item as WatchUi.MenuItem) {
+        var itemId = item.getId();
+
+        if (itemId.equals("altitude_window")) {
+            WatchUi.pushView(new AltitudePicker(), new AltitudePickerDelegate(), WatchUi.SLIDE_IMMEDIATE);
         }
     }
 

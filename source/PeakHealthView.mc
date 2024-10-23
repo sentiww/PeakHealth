@@ -4,8 +4,10 @@ import Toybox.UserProfile;
 import Toybox.Background;
 import Toybox.Time;
 import Toybox.Math;
+import Toybox.Lang;
 import EquationUtils;
 import MathUtils;
+import Toybox.Application.Storage;
 
 class PeakHealthView extends WatchUi.View {
 
@@ -14,6 +16,7 @@ class PeakHealthView extends WatchUi.View {
     hidden var graph;
     hidden var currentAltitude;
     hidden var currentSaturation;
+    hidden var window as Lang.Number;
 
     function initialize() {
         View.initialize();
@@ -23,11 +26,15 @@ class PeakHealthView extends WatchUi.View {
 
         currentAltitude = 0;
         currentSaturation = EquationUtils.getLinearTheoreticalSaturation(currentAltitude);
+
+        window = Storage.getValue("graph_altitude_window");
+        if (window == null) {
+            window = 1000;
+        }
     }
 
     // Load your resources here
     function onLayout(dc as Dc) as Void {
-        setLayout(Rez.Layouts.MainLayout(dc));
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -49,6 +56,11 @@ class PeakHealthView extends WatchUi.View {
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
             :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM
         });
+
+        window = Storage.getValue("graph_altitude_window");
+        if (window == null) {
+            window = 1000;
+        }
     }
 
     // Update the view
@@ -66,11 +78,9 @@ class PeakHealthView extends WatchUi.View {
             :height=>dc.getHeight(),
             :paddingX=>25,
             :paddingY=>50,
-            //:currentAltitude=>1000,
-            //:currentSaturation=>95,
             :currentAltitude=>currentAltitude,
             :currentSaturation=>currentSaturation,
-            :altitudeWindow=>1000,
+            :altitudeWindow=>window,
             :markerSize=>4
         });
         graph.draw(dc);

@@ -8,7 +8,20 @@ class PeakHealthDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onMenu() as Boolean {
-        WatchUi.pushView(new Rez.Menus.MainMenu(), new PeakHealthMenuDelegate(), WatchUi.SLIDE_UP);
+        var menu = new WatchUi.Menu2({
+            :title=>"Menu!"
+        });
+
+        menu.addItem(
+            new MenuItem(
+                "Altitude window",
+                "Visible altitude window",
+                "altitude_window",
+                {}
+            )
+        );
+
+        WatchUi.pushView(menu, new PeakHealthMenuDelegate(), WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
 
