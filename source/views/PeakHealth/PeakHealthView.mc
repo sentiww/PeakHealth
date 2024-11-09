@@ -115,7 +115,7 @@ class PeakHealthView extends WatchUi.View {
             :markerSize=>4,
             :showBestSaturation=>showBestSaturation,
             :showWorstSaturation=>showWorstSaturation,
-            :sensorHistory=>sensorHandler.getSensorHistory()
+            :sensorHistory=>sensorHandler.getSensorHistoryIterator()
         });
         graph.draw(dc);
     }

@@ -18,7 +18,7 @@ class SensorHandler {
 
         _currentSaturation = new ValueAtMoment(now, 100);
         _currentAltitude = new ValueAtMoment(now, 0);
-        _sensorHistory = new CircularBuffer(1000);            
+        _sensorHistory = new CircularBuffer(500);            
 
         Sensor.setEnabledSensors([Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY]);
         Sensor.enableSensorEvents(method(:onSensorEvents));
@@ -32,13 +32,13 @@ class SensorHandler {
         return _instance;
     }
 
-    public function getSensorHistory() as CircularBuffer {
-        return _sensorHistory;
+    public function getSensorHistoryIterator() as CircularBufferIterator {
+        return new CircularBufferIterator(_sensorHistory);
     }
 
     private var debugAltitude = 0;
 
-    function onSensorEvents(sensorInfo as Info) {
+    public function onSensorEvents(sensorInfo as Info) as Void {
         if (sensorInfo == null) {
             return;
         }
