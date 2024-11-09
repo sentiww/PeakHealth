@@ -3,15 +3,15 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-class AltitudePicker extends WatchUi.Picker {
+class BoolPicker extends WatchUi.Picker {
 
     hidden var _startAltitude = 100;
     hidden var _stopAltitude = 1000;
     hidden var _altitudeStep = 100;
 
-    public function initialize() {
+    public function initialize(titleText as String) {
         var title = new WatchUi.Text({
-            :text=>$.Rez.Strings.altitudePickerName, 
+            :text=>titleText, 
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
             :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, 
             :color=>Graphics.COLOR_WHITE
@@ -20,11 +20,11 @@ class AltitudePicker extends WatchUi.Picker {
         Picker.initialize({
             :title=>title, 
             :pattern=>[
-                new $.NumberFactory(
-                    _startAltitude, 
-                    _stopAltitude, 
-                    _altitudeStep, 
-                    { :font=>Graphics.FONT_TINY })
+                new BoolFactory({ 
+                    :font=>Graphics.FONT_TINY,
+                    :trueString=>"Yes",
+                    :falseString=>"No" 
+                })
             ]});
     }
 
@@ -36,10 +36,16 @@ class AltitudePicker extends WatchUi.Picker {
     
 }
 
-class AltitudePickerDelegate extends WatchUi.PickerDelegate {
+class BoolPickerDelegate extends WatchUi.PickerDelegate {
 
-    public function initialize() {
+    hidden var _key as String;
+
+    public function initialize(
+        key as String
+    ) {
         PickerDelegate.initialize();
+
+        _key = key;
     }
 
     public function onCancel() as Boolean {
@@ -47,9 +53,12 @@ class AltitudePickerDelegate extends WatchUi.PickerDelegate {
         return true;
     }
 
-    public function onAccept(values as Array) as Boolean {
-        var altitudeWindow = values[0];
-        Storage.setValue("graph_altitude_window", altitudeWindow);
+    public function onAccept(values as Array<String>) as Boolean {
+        System.println(values);
+
+        var value = values[0];
+
+        Storage.setValue(_key, value.equals("Yes"));
 
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;

@@ -59,4 +59,5 @@ public module MathUtils {
                bottomRight.x > point.x and
                bottomRight.y - 1 > point.y;
     } 
+    
 }

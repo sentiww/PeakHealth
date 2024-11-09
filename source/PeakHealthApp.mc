@@ -6,6 +6,8 @@ import Toybox.Sensor;
 (:background)
 class PeakHealthApp extends Application.AppBase {
 
+    hidden var sensorHandler as SensorHandler;
+
     const fiveMinutes = new Time.Duration(5 * 60);
 
     function initialize() {
@@ -18,6 +20,8 @@ class PeakHealthApp extends Application.AppBase {
         else {
             System.println("Device doesn't support background services");
         }
+
+        sensorHandler = SensorHandler.getInstance();
     }
 
     function onStart(state as Dictionary?) as Void {
@@ -29,7 +33,6 @@ class PeakHealthApp extends Application.AppBase {
     function getInitialView() as [Views] or [Views, InputDelegates] {
         return [ new PeakHealthView(), new PeakHealthDelegate() ];
     }
-
     
     function getServiceDelegate() {
         return [new BackgroundServiceDelegate()];

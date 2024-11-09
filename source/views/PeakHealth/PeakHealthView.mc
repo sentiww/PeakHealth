@@ -8,6 +8,7 @@ import Toybox.Lang;
 import Toybox.Application.Storage;
 import EquationUtils;
 import MathUtils;
+import Toybox.Timer;
 
 class PeakHealthView extends WatchUi.View {
 
@@ -17,33 +18,42 @@ class PeakHealthView extends WatchUi.View {
     hidden var currentAltitude;
     hidden var currentSaturation;
     hidden var window as Lang.Number;
+    hidden var showBestSaturation as Lang.Boolean;
+    hidden var showWorstSaturation as Lang.Boolean;
+    hidden var timer as Timer;
 
     function initialize() {
         View.initialize();
 
-        Sensor.setEnabledSensors([Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY]);
-        Sensor.enableSensorEvents(method(:onSensorEvents));
-
         currentAltitude = 0;
         currentSaturation = EquationUtils.getLinearTheoreticalSaturation(currentAltitude);
+
+        showBestSaturation = Storage.getValue("show_best_saturation");
+        if (showBestSaturation == null) {
+            showBestSaturation = true;
+        }
+
+        showWorstSaturation = Storage.getValue("show_worst_saturation");
+        if (showWorstSaturation == null) {
+            showWorstSaturation = true;
+        }
 
         window = Storage.getValue("graph_altitude_window");
         if (window == null) {
             window = 1000;
         }
+
+        timer = new Timer.Timer();
+        timer.start(method(:timerCallback), 5000, true);
     }
 
-    // Load your resources here
     function onLayout(dc as Dc) as Void {
     }
 
-    // Called when this View is brought to the foreground. Restore
-    // the state of this View and prepare it to be shown. This includes
-    // loading resources into memory.
     function onShow() as Void {
         oxygenSaturationText = new WatchUi.Text({
             :text=>"000",
-            :color=>Graphics.COLOR_WHITE,
+            :color=>Graphics.COLOR_RED,
             :font=>Graphics.FONT_MEDIUM,
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
             :locY=>WatchUi.LAYOUT_VALIGN_TOP
@@ -51,11 +61,21 @@ class PeakHealthView extends WatchUi.View {
 
         aosText = new WatchUi.Text({
             :text=>"000",
-            :color=>Graphics.COLOR_WHITE,
+            :color=>Graphics.COLOR_BLUE,
             :font=>Graphics.FONT_MEDIUM,
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
             :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM
         });
+
+        showBestSaturation = Storage.getValue("show_best_saturation");
+        if (showBestSaturation == null) {
+            showBestSaturation = true;
+        }
+
+        showWorstSaturation = Storage.getValue("show_worst_saturation");
+        if (showWorstSaturation == null) {
+            showWorstSaturation = true;
+        }
 
         window = Storage.getValue("graph_altitude_window");
         if (window == null) {
@@ -83,7 +103,9 @@ class PeakHealthView extends WatchUi.View {
             :currentAltitude=>currentAltitude,
             :currentSaturation=>currentSaturation,
             :altitudeWindow=>window,
-            :markerSize=>4
+            :markerSize=>4,
+            :showBestSaturation=>showBestSaturation,
+            :showWorstSaturation=>showWorstSaturation
         });
         graph.draw(dc);
     }
@@ -94,72 +116,19 @@ class PeakHealthView extends WatchUi.View {
     function onHide() as Void {
     }
 
-    function onSensorEvents(sensorInfo) {
-        currentAltitude += 100;
-        currentSaturation = EquationUtils.getPolynomialTheoreticalSaturation(currentAltitude);
-        
-        var mockAos = EquationUtils.getLinearTheoreticalSaturation(currentAltitude);
-        mockAos = MathUtils.clamp(mockAos, 0, 100);
-        
-        oxygenSaturationText = new WatchUi.Text({
-            :text=>currentSaturation.format("%02d"),
-            :color=>Graphics.COLOR_WHITE,
-            :font=>Graphics.FONT_MEDIUM,
-            :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
-            :locY=>WatchUi.LAYOUT_VALIGN_TOP
-        });
-        
-        aosText = new WatchUi.Text({
-            :text=>mockAos.format("%02d"),
-            :color=>Graphics.COLOR_WHITE,
-            :font=>Graphics.FONT_MEDIUM,
-            :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
-            :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM
-        });
-        WatchUi.requestUpdate();
-        return;
+    function timerCallback() {
+        var sensorHandler = SensorHandler.getInstance();
 
-        if (sensorInfo == null) {
-            System.println("SensorInfo was null");
-            return;
-        }
-
-        var oxygenSaturation = sensorInfo.oxygenSaturation; 
-        var altitude = sensorInfo.altitude;
-
-        if (oxygenSaturation == null) {
-            System.println("Got sensor update, oxygenSaturation was null");
-            return;
-        }
-
-        if (altitude == null) {
-            System.println("Got sensor update, altitude was null");
-            return;
-        }
-
-        currentSaturation = oxygenSaturation;
-        currentAltitude = altitude;
+        currentSaturation = sensorHandler.getCurrentSaturation().value;
+        currentAltitude = sensorHandler.getCurrentAltitude().value;
 
         System.println("Got sensor update");
 
-        var aos = EquationUtils.getLinearTheoreticalSaturation(altitude);
+        var aos = EquationUtils.getLinearTheoreticalSaturation(currentAltitude);
         aos = MathUtils.clamp(aos, 0, 100);
-
-        oxygenSaturationText = new WatchUi.Text({
-            :text=>oxygenSaturation.format("%02d"),
-            :color=>Graphics.COLOR_WHITE,
-            :font=>Graphics.FONT_MEDIUM,
-            :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
-            :locY=>WatchUi.LAYOUT_VALIGN_TOP
-        });
-
-        aosText = new WatchUi.Text({
-            :text=>aos.format("%02d"),
-            :color=>Graphics.COLOR_WHITE,
-            :font=>Graphics.FONT_MEDIUM,
-            :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
-            :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM
-        });
+        
+        oxygenSaturationText.setText(currentSaturation.format("%02d"));
+        aosText.setText(aos.format("%02d"));
 
         WatchUi.requestUpdate();
     }

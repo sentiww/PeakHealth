@@ -4,6 +4,7 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 class NumberFactory extends WatchUi.PickerFactory {
+    
     private var _start as Number;
     private var _stop as Number;
     private var _increment as Number;
@@ -56,8 +57,7 @@ class NumberFactory extends WatchUi.PickerFactory {
             :color=>Graphics.COLOR_WHITE, 
             :font=>_font,
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER, 
-            :locY=>WatchUi.LAYOUT_VALIGN_CENTER,
-            :width=>200
+            :locY=>WatchUi.LAYOUT_VALIGN_CENTER
         });
     }
 

@@ -10,10 +10,12 @@ class BackgroundServiceDelegate extends System.ServiceDelegate {
     }
 
     function onTemporalEvent() {
-        System.println("IN TEMPORAL");
+        var sensorHandler = SensorHandler.getInstance();
 
-        // TODO: Add background alert when actual saturation is below threshold
-        if (false) {
+        var altitude = sensorHandler.getCurrentAltitude();
+        var saturation = sensorHandler.getCurrentSaturation();
+
+        if (saturation.value <= EquationUtils.getLinearTheoreticalSaturation(altitude) * 0.95) {
             Background.requestApplicationWake("Test message");
             Background.exit(null);
         }

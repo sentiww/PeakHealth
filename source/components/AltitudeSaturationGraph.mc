@@ -26,6 +26,9 @@ class AltitudeSaturationGraph {
 
     var markerSize as Lang.Number;
 
+    var showBestSaturation as Lang.Boolean;
+    var showWorstSaturation as Lang.Boolean;
+
     function initialize(options as {
         :width as Lang.Number,
         :height as Lang.Number,
@@ -34,7 +37,9 @@ class AltitudeSaturationGraph {
         :currentAltitude as Lang.Number,
         :currentSaturation as Lang.Float,
         :altitudeWindow as Lang.Number,
-        :markerSize as Lang.Number
+        :markerSize as Lang.Number,
+        :showBestSaturation as Lang.Boolean,
+        :showWorstSaturation as Lang.Boolean
     }) {
         width = options.get(:width);
         height = options.get(:height);
@@ -44,6 +49,8 @@ class AltitudeSaturationGraph {
         currentSaturation = options.get(:currentSaturation);
         altitudeWindow = options.get(:altitudeWindow);
         markerSize = options.get(:markerSize);
+        showBestSaturation = options.get(:showBestSaturation);
+        showWorstSaturation = options.get(:showWorstSaturation);
 
         topLeft = new Point(paddingX, paddingY);
         topRight = new Point(width - paddingX, paddingY);
@@ -55,13 +62,15 @@ class AltitudeSaturationGraph {
     }
 
     function draw(dc as Dc) {
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawBorders(dc);
 
         var minAltitude = MathUtils.max(currentAltitude - altitudeWindow, 0);
         var maxAltitude = currentAltitude + altitudeWindow;
 
-        var minSaturation = getMinSaturation(maxAltitude);
         var maxSaturation = getMaxSaturation(minAltitude);
+        //var minSaturation = getMinSaturation(maxAltitude);
+        var minSaturation = maxSaturation - 20;
 
         var altitudeScale = (maxAltitude - minAltitude) / canvasWidth;
         var saturationScale = canvasHeight / (maxSaturation - minSaturation);
@@ -93,10 +102,10 @@ class AltitudeSaturationGraph {
             var worstNewPoint = new Point(graphX, worstGraphY);
 
             dc.setColor(Graphics.COLOR_DK_BLUE, Graphics.COLOR_BLACK);
-            if (MathUtils.isInRectangle(topLeft, bottomRight, bestNewPoint)) {
+            if (MathUtils.isInRectangle(topLeft, bottomRight, bestNewPoint) && showBestSaturation) {
                 dc.drawPoint(bestNewPoint.x, bestNewPoint.y);
             }
-            if (MathUtils.isInRectangle(topLeft, bottomRight, worstNewPoint)) {
+            if (MathUtils.isInRectangle(topLeft, bottomRight, worstNewPoint) && showWorstSaturation) {
                 dc.drawPoint(worstNewPoint.x, worstNewPoint.y);
             }
 
@@ -108,6 +117,23 @@ class AltitudeSaturationGraph {
 
         dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_BLACK);
         drawMarker(dc, currentPoint, scrollY);
+        drawAltitude(dc, currentPoint, scrollY);
+    }
+
+    private function drawAltitude(
+        dc as Dc,
+        currentPoint as Point,
+        scrollY as Lang.Number
+    ) as Void {
+        var altitudeFormat = "($1$m)";
+        var roundedAltitude = Math.round(currentAltitude).toNumber();
+        dc.drawText(
+            currentPoint.x, 
+            currentPoint.y + 4 + markerSize - scrollY, 
+            Graphics.FONT_XTINY,
+            Lang.format(altitudeFormat, [roundedAltitude]), 
+            Graphics.TEXT_JUSTIFY_CENTER
+        );
     }
 
     private function drawBorders(
@@ -154,6 +180,9 @@ class AltitudeSaturationGraph {
         altitudeScale as Lang.Number or Lang.Float,
         saturationScale as Lang.Number or Lang.Float
     ) as Point {
+        if (altitudeScale == 0) {
+            altitudeScale = 1;
+        }
         var scaledAltitude = (currentAltitude - minAltitude) / altitudeScale; 
         var currentX = scaledAltitude + topLeft.x + 1;
         var currentY = topLeft.y + saturationScale * (100 - currentSaturation) + 1;
@@ -161,4 +190,5 @@ class AltitudeSaturationGraph {
         var currentPoint = new Point(currentX, currentY);
         return currentPoint;
     }
+
 }
