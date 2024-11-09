@@ -29,6 +29,8 @@ class AltitudeSaturationGraph {
     var showBestSaturation as Lang.Boolean;
     var showWorstSaturation as Lang.Boolean;
 
+    var sensorHistory as CircularBuffer;
+
     function initialize(options as {
         :width as Lang.Number,
         :height as Lang.Number,
@@ -59,24 +61,50 @@ class AltitudeSaturationGraph {
         
         canvasWidth = topRight.x - topLeft.x - 2;
         canvasHeight = bottomRight.y - topRight.y; 
+
+        var sensorHandler = SensorHandler.getInstance();
+        sensorHistory = sensorHandler.getSensorHistory();
     }
 
     function draw(dc as Dc) {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawBorders(dc);
 
+        var xValues = [];
+        var yValues = [];
+
+        for (var i = 0; i < sensorHistory.size(); i++) {
+            var sensorData = sensorHistory.get(i);
+
+            if (sensorData == null) {
+                break;
+            }
+
+            xValues.add(sensorData.altitude);
+            yValues.add(sensorData.saturation);
+        }
+
+        var regression = linearRegression(xValues, yValues);
+        var slope = regression.get(:slope);
+        var intercept = regression.get(:intercept);
+
+        var confidence = confidenceInterval(xValues, yValues, slope, intercept);
+        var slopeLower = confidence.get(:slopeConfidenceInterval).get(:lower);
+        var slopeUpper = confidence.get(:slopeConfidenceInterval).get(:upper);
+        var interceptLower = confidence.get(:interceptConfidenceInterval).get(:lower);
+        var interceptUpper = confidence.get(:interceptConfidenceInterval).get(:upper);
+
         var minAltitude = MathUtils.max(currentAltitude - altitudeWindow, 0);
         var maxAltitude = currentAltitude + altitudeWindow;
 
         var maxSaturation = getMaxSaturation(minAltitude);
-        //var minSaturation = getMinSaturation(maxAltitude);
         var minSaturation = maxSaturation - 20;
 
         var altitudeScale = (maxAltitude - minAltitude) / canvasWidth;
         var saturationScale = canvasHeight / (maxSaturation - minSaturation);
 
         var currentPoint = getCurrentPoint(minAltitude, altitudeScale, saturationScale);
-        
+
         var scrollY = 0;
 
         for (var canvasX = 0; canvasX <= canvasWidth; canvasX++) {
@@ -115,9 +143,178 @@ class AltitudeSaturationGraph {
             }
         }
 
+        dc.setColor(Graphics.COLOR_DK_RED, Graphics.COLOR_BLACK);
+        for (var canvasX = 0; canvasX <= canvasWidth; canvasX++) {
+            var altitude = minAltitude + canvasX * altitudeScale;
+
+            var upperSaturation = slopeUpper * altitude + interceptUpper;
+            upperSaturation = MathUtils.clamp(upperSaturation, minSaturation, maxSaturation);
+
+            var graphX = canvasX + topLeft.x + 1;
+            var upperGraphY = topLeft.y + saturationScale * (100 - upperSaturation) + 1;
+            upperGraphY -= scrollY;
+
+            var upperPoint = new Point(graphX, upperGraphY);
+            if (MathUtils.isInRectangle(topLeft, bottomRight, upperPoint)) {
+                dc.drawPoint(upperPoint.x, upperPoint.y);
+            }
+
+            var lowerSaturation = slopeLower * altitude + interceptLower;
+            lowerSaturation = MathUtils.clamp(lowerSaturation, minSaturation, maxSaturation);
+
+            var lowerGraphY = topLeft.y + saturationScale * (100 - lowerSaturation) + 1;
+            lowerGraphY -= scrollY;
+
+            var lowerPoint = new Point(graphX, lowerGraphY);
+            if (MathUtils.isInRectangle(topLeft, bottomRight, lowerPoint)) {
+                dc.drawPoint(lowerPoint.x, lowerPoint.y);
+            }
+        }
+
         dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_BLACK);
+        for (var canvasX = 0; canvasX <= canvasWidth; canvasX++) {
+            var altitude = minAltitude + canvasX * altitudeScale;
+            var predictedSaturation = slope * altitude + intercept;
+
+            predictedSaturation = MathUtils.clamp(predictedSaturation, minSaturation, maxSaturation);
+
+            var graphX = canvasX + topLeft.x + 1;
+            var graphY = topLeft.y + saturationScale * (100 - predictedSaturation) + 1;
+            graphY -= scrollY; 
+
+            var regressionPoint = new Point(graphX, graphY);
+
+            if (MathUtils.isInRectangle(topLeft, bottomRight, regressionPoint)) {
+                dc.drawPoint(regressionPoint.x, regressionPoint.y);
+            }
+        }
+
+        dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
         drawMarker(dc, currentPoint, scrollY);
         drawAltitude(dc, currentPoint, scrollY);
+    }
+
+    private function linearRegression(xValues, yValues) {
+        var n = xValues.size();
+        var xMean = Math.mean(xValues);
+        var yMean = Math.mean(yValues);
+
+        var numerator = 0.0;
+        var denominator = 0.0;
+        for (var i = 0; i < n; i++) {
+            numerator += (xValues[i] - xMean) * (yValues[i] - yMean);
+            denominator += (xValues[i] - xMean) * (xValues[i] - xMean);
+        }
+
+        if (denominator == 0) {
+            denominator = 1;
+        }
+
+        var slope = numerator / denominator;
+
+        var intercept = yMean - slope * xMean;
+
+        return {
+            :slope=>slope,
+            :intercept=>intercept
+        };
+    }
+
+    private function standardErrorSlope(xValues, yValues, slope, intercept) {
+        var n = xValues.size();
+        var residualsSum = 0.0;
+        var xMean = Math.mean(xValues);
+
+        for (var i = 0; i < n; i++) {
+            var predictedY = slope * xValues[i] + intercept;
+            residualsSum += (yValues[i] - predictedY) * (yValues[i] - predictedY);
+        }
+
+        var residualVariance = residualsSum / (n - 2);
+        var denominator = 0.0;
+        for (var i = 0; i < n; i++) {
+            denominator += (xValues[i] - xMean) * (xValues[i] - xMean);
+        }
+
+        if (denominator == 0) {
+            denominator = 1;
+        }
+
+        var standardError = Math.sqrt(residualVariance / denominator);
+        return standardError;
+    }
+
+    private function confidenceInterval(xValues, yValues, slope, intercept) {
+        var n = xValues.size();
+        var standardErrorSlope = standardErrorSlope(xValues, yValues, slope, intercept);
+
+        var tValue = calculateTValue(n - 2);
+
+        var slopeLower = slope - tValue * standardErrorSlope;
+        var slopeUpper = slope + tValue * standardErrorSlope;
+
+        var standardErrorIntercept = standardErrorSlope * Math.sqrt(MathUtils.sum(xValues) / n);
+        var interceptLower = intercept - tValue * standardErrorIntercept;
+        var interceptUpper = intercept + tValue * standardErrorIntercept;
+
+        return {
+            :slopeConfidenceInterval=>{
+                :lower=>slopeLower,
+                :upper=>slopeUpper
+            },
+            :interceptConfidenceInterval=>{
+                :lower=>interceptLower,
+                :upper=>interceptUpper
+            }
+        };  
+    }
+
+    private function calculateTValue(df as Lang.Number) as Lang.Number {
+        if (df > 30) {
+            return 1.96;
+        }
+
+        var tValue = 0.0;
+
+        var tTable = {};
+        tTable[1] = 12.706;
+        tTable[2] = 4.303;
+        tTable[3] = 3.182;
+        tTable[4] = 2.776;
+        tTable[5] = 2.571;
+        tTable[6] = 2.447;
+        tTable[7] = 2.365;
+        tTable[8] = 2.306;
+        tTable[9] = 2.262;
+        tTable[10] = 2.228;
+        tTable[11] = 2.201;
+        tTable[12] = 2.179;
+        tTable[13] = 2.160;
+        tTable[14] = 2.145;
+        tTable[15] = 2.131;
+        tTable[16] = 2.120;
+        tTable[17] = 2.110;
+        tTable[18] = 2.101;
+        tTable[19] = 2.093;
+        tTable[20] = 2.086;
+        tTable[21] = 2.080;
+        tTable[22] = 2.074;
+        tTable[23] = 2.069;
+        tTable[24] = 2.064;
+        tTable[25] = 2.060;
+        tTable[26] = 2.056;
+        tTable[27] = 2.052;
+        tTable[28] = 2.048;
+        tTable[29] = 2.045;
+        tTable[30] = 2.042;
+
+        if (tTable.hasKey(df)) {
+            tValue = tTable.get(df);
+        } else {
+            tValue = 1.96;  // Approximate
+        }
+
+        return tValue;
     }
 
     private function drawAltitude(

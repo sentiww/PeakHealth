@@ -59,5 +59,17 @@ public module MathUtils {
                bottomRight.x > point.x and
                bottomRight.y - 1 > point.y;
     } 
+
+    public function sum(
+        values as Array<Lang.Numeric>
+    ) as Lang.Numeric {
+        var accumulator = 0;
+
+        for (var i = 0; i < values.size(); i++) {
+            accumulator += values[i];
+        }
+
+        return accumulator;
+    }
     
 }

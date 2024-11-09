@@ -24,16 +24,16 @@ class SensorHandler {
         Sensor.enableSensorEvents(method(:onSensorEvents));
     }
 
-    public function persistSensorHistory() {
-        Storage.setValue("sensor_history", _sensorHistory);
-    }
-
     public static function getInstance() as SensorHandler {
         if (_instance == null) {
             _instance = new SensorHandler();
         }
 
         return _instance;
+    }
+
+    public function getSensorHistory() as CircularBuffer {
+        return _sensorHistory;
     }
 
     private var debugAltitude = 0;
@@ -48,10 +48,10 @@ class SensorHandler {
         var oxygenSaturation = sensorInfo.oxygenSaturation; 
         var altitude = sensorInfo.altitude;
 
-        debugAltitude += 1;
+        debugAltitude += Math.rand() % 100;
 
         altitude = debugAltitude;
-        oxygenSaturation = EquationUtils.getLinearTheoreticalSaturation(altitude);
+        oxygenSaturation = EquationUtils.getLinearTheoreticalSaturation(altitude) + Math.rand() % 5 - Math.rand() % 5;
 
         if (shouldSetCurrent(oxygenSaturation, altitude)) {
             _currentSaturation = new ValueAtMoment(now, oxygenSaturation);
