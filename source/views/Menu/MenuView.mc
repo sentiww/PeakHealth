@@ -29,6 +29,13 @@ class MenuView extends WatchUi.Menu2 {
             {}
         );
 
+        var tutorial = new MenuItem(
+            "Tutorial",
+            "Learn to use the app",
+            "tutorial",
+            {}
+        );
+
         var debug = new MenuItem(
             "Debug",
             "Show variables",
@@ -40,6 +47,7 @@ class MenuView extends WatchUi.Menu2 {
             altitueWindow,
             bestSaturation,
             worstSaturation,
+            tutorial,
             debug
         ] as Array<MenuItem>;
 

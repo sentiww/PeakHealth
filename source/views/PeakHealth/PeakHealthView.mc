@@ -51,6 +51,13 @@ class PeakHealthView extends WatchUi.View {
     }
 
     function onShow() as Void {
+        var shownTutorial = Storage.getValue("shown_tutorial");
+        if (shownTutorial == null or !shownTutorial) {
+            var tutorialView = new TutorialView();
+            WatchUi.pushView(tutorialView, new TutorialDelegate(tutorialView), WatchUi.SLIDE_IMMEDIATE);
+            Storage.setValue("shown_tutorial", true);
+        }
+
         oxygenSaturationText = new WatchUi.Text({
             :text=>"000",
             :color=>Graphics.COLOR_RED,
@@ -93,11 +100,13 @@ class PeakHealthView extends WatchUi.View {
 
         dc.setAntiAlias(true);
 
+        var sensorHandler = SensorHandler.getInstance();
         graph = new AltitudeSaturationGraph({
             :width=>dc.getWidth(),
             :height=>dc.getHeight(),
             :paddingX=>25,
-            :paddingY=>50,
+            :paddingTop=>50,
+            :paddingBottom=>50,
             //:currentAltitude=>1000,
             //:currentSaturation=>95,
             :currentAltitude=>currentAltitude,
@@ -105,7 +114,8 @@ class PeakHealthView extends WatchUi.View {
             :altitudeWindow=>window,
             :markerSize=>4,
             :showBestSaturation=>showBestSaturation,
-            :showWorstSaturation=>showWorstSaturation
+            :showWorstSaturation=>showWorstSaturation,
+            :sensorHistory=>sensorHandler.getSensorHistory()
         });
         graph.draw(dc);
     }

@@ -20,6 +20,10 @@ class MenuDelegate extends WatchUi.Menu2InputDelegate {
         else if (itemId.equals("worst_saturation")) {
             WatchUi.pushView(new BoolPicker("Show worst"), new BoolPickerDelegate("show_worst_saturation"), WatchUi.SLIDE_IMMEDIATE);
         }
+        else if (itemId.equals("tutorial")) {
+            var tutorialView = new TutorialView();
+            WatchUi.pushView(tutorialView, new TutorialDelegate(tutorialView), WatchUi.SLIDE_IMMEDIATE);
+        }
         else if (itemId.equals("debug")) {
             WatchUi.pushView(new DebugView(), new DebugDelegate(), WatchUi.SLIDE_IMMEDIATE);
         }

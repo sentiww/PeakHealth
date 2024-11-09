@@ -1,5 +1,6 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
+import Toybox.Application.Storage;
 
 class PeakHealthDelegate extends WatchUi.BehaviorDelegate {
 

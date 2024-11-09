@@ -6,7 +6,8 @@ import EquationUtils;
 class AltitudeSaturationGraph {
 
     var paddingX as Lang.Number;
-    var paddingY as Lang.Number;
+    var paddingTop as Lang.Number;
+    var paddingBottom as Lang.Number;
 
     var currentAltitude as Lang.Number or Lang.Float;
     var currentSaturation as Lang.Number or Lang.Float;
@@ -35,35 +36,36 @@ class AltitudeSaturationGraph {
         :width as Lang.Number,
         :height as Lang.Number,
         :paddingX as Lang.Number,
-        :paddingY as Lang.Number,
+        :paddingTop as Lang.Number,
+        :paddingBottom as Lang.Number,
         :currentAltitude as Lang.Number,
         :currentSaturation as Lang.Float,
         :altitudeWindow as Lang.Number,
         :markerSize as Lang.Number,
         :showBestSaturation as Lang.Boolean,
-        :showWorstSaturation as Lang.Boolean
+        :showWorstSaturation as Lang.Boolean,
+        :sensorHistory as CircularBuffer
     }) {
         width = options.get(:width);
         height = options.get(:height);
         paddingX = options.get(:paddingX);
-        paddingY = options.get(:paddingY);
+        paddingTop = options.get(:paddingTop);
+        paddingBottom = options.get(:paddingBottom);
         currentAltitude = options.get(:currentAltitude);
         currentSaturation = options.get(:currentSaturation);
         altitudeWindow = options.get(:altitudeWindow);
         markerSize = options.get(:markerSize);
         showBestSaturation = options.get(:showBestSaturation);
         showWorstSaturation = options.get(:showWorstSaturation);
+        sensorHistory = options.get(:sensorHistory);
 
-        topLeft = new Point(paddingX, paddingY);
-        topRight = new Point(width - paddingX, paddingY);
-        bottomLeft = new Point(paddingX, height - paddingY);
-        bottomRight = new Point(width - paddingX, height - paddingY);
+        topLeft = new Point(paddingX, paddingTop);
+        topRight = new Point(width - paddingX, paddingTop);
+        bottomLeft = new Point(paddingX, height - paddingBottom);
+        bottomRight = new Point(width - paddingX, height - paddingBottom);
         
         canvasWidth = topRight.x - topLeft.x - 2;
         canvasHeight = bottomRight.y - topRight.y; 
-
-        var sensorHandler = SensorHandler.getInstance();
-        sensorHistory = sensorHandler.getSensorHistory();
     }
 
     function draw(dc as Dc) {
@@ -196,8 +198,14 @@ class AltitudeSaturationGraph {
 
     private function linearRegression(xValues, yValues) {
         var n = xValues.size();
-        var xMean = Math.mean(xValues);
-        var yMean = Math.mean(yValues);
+        var xMean = 0;
+        if (xValues.size() > 0) {
+            xMean = Math.mean(xValues);
+        }
+        var yMean = 0;
+        if (yValues.size() > 0) {
+            yMean = Math.mean(yValues);
+        }
 
         var numerator = 0.0;
         var denominator = 0.0;
@@ -223,7 +231,11 @@ class AltitudeSaturationGraph {
     private function standardErrorSlope(xValues, yValues, slope, intercept) {
         var n = xValues.size();
         var residualsSum = 0.0;
-        var xMean = Math.mean(xValues);
+
+        var xMean = 0;
+        if (xValues.size() > 0) {
+            xMean = Math.mean(xValues);
+        }
 
         for (var i = 0; i < n; i++) {
             var predictedY = slope * xValues[i] + intercept;
@@ -246,6 +258,9 @@ class AltitudeSaturationGraph {
 
     private function confidenceInterval(xValues, yValues, slope, intercept) {
         var n = xValues.size();
+        if (n == 0) {
+            n = 1;
+        }
         var standardErrorSlope = standardErrorSlope(xValues, yValues, slope, intercept);
 
         var tValue = calculateTValue(n - 2);
@@ -253,7 +268,11 @@ class AltitudeSaturationGraph {
         var slopeLower = slope - tValue * standardErrorSlope;
         var slopeUpper = slope + tValue * standardErrorSlope;
 
-        var standardErrorIntercept = standardErrorSlope * Math.sqrt(MathUtils.sum(xValues) / n);
+        var sum = 0;
+        if (xValues.size() > 0) {
+            sum = MathUtils.sum(xValues);
+        }
+        var standardErrorIntercept = standardErrorSlope * Math.sqrt(sum / n);
         var interceptLower = intercept - tValue * standardErrorIntercept;
         var interceptUpper = intercept + tValue * standardErrorIntercept;
 
