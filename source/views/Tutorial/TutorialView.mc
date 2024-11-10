@@ -19,6 +19,8 @@ class TutorialView extends WatchUi.View {
     private var _bottomText;
     private var _graph;
 
+    private var _riskSensorHistory;
+    private var _sampleSensorHistory;
     private var _sampleGraph;
     private var _riskGraph;
 
@@ -52,17 +54,18 @@ class TutorialView extends WatchUi.View {
             _height = dc.getHeight();
         }
         if (_sampleGraph == null) {
-            var sensorHistory = new CircularBuffer(10);
-            sensorHistory.add(new SensorSnapshot(null, 1000, 100));
-            sensorHistory.add(new SensorSnapshot(null, 1100, 100));
-            sensorHistory.add(new SensorSnapshot(null, 1200, 100));
-            sensorHistory.add(new SensorSnapshot(null, 1300, 99));
-            sensorHistory.add(new SensorSnapshot(null, 1400, 99));
-            sensorHistory.add(new SensorSnapshot(null, 1500, 99));
-            sensorHistory.add(new SensorSnapshot(null, 1600, 99));
-            sensorHistory.add(new SensorSnapshot(null, 1700, 98));
-            sensorHistory.add(new SensorSnapshot(null, 1800, 98));
-            sensorHistory.add(new SensorSnapshot(null, 1900, 97));
+            var sensorHistoryBuffer = new CircularBuffer(10);
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1000, 100));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1100, 100));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1200, 100));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1300, 99));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1400, 99));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1500, 99));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1600, 99));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1700, 98));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1800, 98));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1900, 97));
+            _sampleSensorHistory = new CircularBufferIterator(sensorHistoryBuffer);
             _sampleGraph = new AltitudeSaturationGraph({
                 :width=>_width,
                 :height=>_height,
@@ -75,21 +78,22 @@ class TutorialView extends WatchUi.View {
                 :markerSize=>4,
                 :showBestSaturation=>true,
                 :showWorstSaturation=>true,
-                :sensorHistory=>sensorHistory
+                :sensorHistory=>_sampleSensorHistory
             });
         }
         if (_riskGraph == null) {
-            var sensorHistory = new CircularBuffer(10);
-            sensorHistory.add(new SensorSnapshot(null, 1000, 100));
-            sensorHistory.add(new SensorSnapshot(null, 1100, 100));
-            sensorHistory.add(new SensorSnapshot(null, 1200, 99));
-            sensorHistory.add(new SensorSnapshot(null, 1300, 99));
-            sensorHistory.add(new SensorSnapshot(null, 1400, 95));
-            sensorHistory.add(new SensorSnapshot(null, 1500, 95));
-            sensorHistory.add(new SensorSnapshot(null, 1600, 94));
-            sensorHistory.add(new SensorSnapshot(null, 1700, 93));
-            sensorHistory.add(new SensorSnapshot(null, 1800, 91));
-            sensorHistory.add(new SensorSnapshot(null, 1900, 91));
+            var sensorHistoryBuffer = new CircularBuffer(10);
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1000, 100));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1100, 100));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1200, 99));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1300, 99));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1400, 95));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1500, 95));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1600, 94));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1700, 93));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1800, 91));
+            sensorHistoryBuffer.add(new SensorSnapshot(null, 1900, 91));
+            _riskSensorHistory = new CircularBufferIterator(sensorHistoryBuffer);
             _riskGraph = new AltitudeSaturationGraph({
                 :width=>_width,
                 :height=>_height,
@@ -102,7 +106,7 @@ class TutorialView extends WatchUi.View {
                 :markerSize=>4,
                 :showBestSaturation=>true,
                 :showWorstSaturation=>true,
-                :sensorHistory=>sensorHistory
+                :sensorHistory=>_riskSensorHistory
             });
         }
 
@@ -213,6 +217,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _sampleSensorHistory.reset();
             _graph = _sampleGraph;
         }
         else if (_state == TutorialState.GRAPH_2) {
@@ -230,6 +235,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _sampleSensorHistory.reset();
             _graph = _sampleGraph;
         }
         else if (_state == TutorialState.GRAPH_3) {
@@ -247,6 +253,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _sampleSensorHistory.reset();
             _graph = _sampleGraph;
         }
         else if (_state == TutorialState.GRAPH_4) {
@@ -264,6 +271,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _sampleSensorHistory.reset();
             _graph = _sampleGraph;
         }
         else if (_state == TutorialState.GRAPH_5) {
@@ -281,6 +289,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _sampleSensorHistory.reset();
             _graph = _sampleGraph;
         }
         else if (_state == TutorialState.GRAPH_6) {
@@ -298,6 +307,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _sampleSensorHistory.reset();
             _graph = _sampleGraph;
         }
         else if (_state == TutorialState.GRAPH_7) {
@@ -315,6 +325,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _sampleSensorHistory.reset();
             _graph = _sampleGraph;
         }
         else if (_state == TutorialState.GRAPH_8) {
@@ -332,6 +343,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _sampleSensorHistory.reset();
             _graph = _sampleGraph;            
         }
         else if (_state == TutorialState.GRAPH_9) {
@@ -349,6 +361,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _sampleSensorHistory.reset();
             _graph = _sampleGraph;
         }
         else if (_state == TutorialState.GRAPH_10) {
@@ -366,6 +379,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _sampleSensorHistory.reset();
             _graph = _sampleGraph;
         }
         else if (_state == TutorialState.GRAPH_11) {
@@ -383,6 +397,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _sampleSensorHistory.reset();
             _graph = _sampleGraph;
         }
         else if (_state == TutorialState.GRAPH_12) {
@@ -400,6 +415,7 @@ class TutorialView extends WatchUi.View {
                 :height=>120
             });
 
+            _riskSensorHistory.reset();
             _graph = _riskGraph;
         }
         else if (_state == TutorialState.BACKGROUND_SERVICE_1) {

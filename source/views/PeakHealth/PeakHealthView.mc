@@ -44,13 +44,14 @@ class PeakHealthView extends WatchUi.View {
         }
 
         timer = new Timer.Timer();
-        timer.start(method(:timerCallback), 5000, true);
     }
 
     function onLayout(dc as Dc) as Void {
     }
 
     function onShow() as Void {
+        timer.start(method(:timerCallback), 5000, true);
+
         var shownTutorial = Storage.getValue("shown_tutorial");
         if (shownTutorial == null or !shownTutorial) {
             var tutorialView = new TutorialView();
@@ -124,6 +125,7 @@ class PeakHealthView extends WatchUi.View {
     // state of this View here. This includes freeing resources from
     // memory.
     function onHide() as Void {
+        timer.stop();
     }
 
     function timerCallback() {

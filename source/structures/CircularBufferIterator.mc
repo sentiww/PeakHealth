@@ -8,7 +8,7 @@ class CircularBufferIterator {
 
     public function initialize(buffer as CircularBuffer) {
         _buffer = buffer;
-        _index = buffer.getIndex();
+        _index = 0;
         _size = buffer.size();
     }
 
