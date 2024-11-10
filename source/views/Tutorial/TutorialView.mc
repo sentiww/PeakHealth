@@ -54,7 +54,7 @@ class TutorialView extends WatchUi.View {
             _height = dc.getHeight();
         }
         if (_sampleGraph == null) {
-            var sensorHistoryBuffer = new CircularBuffer(10);
+            var sensorHistoryBuffer = new SensorSnapshotCircularBuffer(10);
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1000, 100));
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1100, 100));
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1200, 100));
@@ -65,7 +65,7 @@ class TutorialView extends WatchUi.View {
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1700, 98));
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1800, 98));
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1900, 97));
-            _sampleSensorHistory = new CircularBufferIterator(sensorHistoryBuffer);
+            _sampleSensorHistory = new SensorSnapshotCircularBufferIterator(sensorHistoryBuffer);
             _sampleGraph = new AltitudeSaturationGraph({
                 :width=>_width,
                 :height=>_height,
@@ -82,7 +82,7 @@ class TutorialView extends WatchUi.View {
             });
         }
         if (_riskGraph == null) {
-            var sensorHistoryBuffer = new CircularBuffer(10);
+            var sensorHistoryBuffer = new SensorSnapshotCircularBuffer(10);
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1000, 100));
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1100, 100));
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1200, 99));
@@ -93,7 +93,7 @@ class TutorialView extends WatchUi.View {
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1700, 93));
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1800, 91));
             sensorHistoryBuffer.add(new SensorSnapshot(null, 1900, 91));
-            _riskSensorHistory = new CircularBufferIterator(sensorHistoryBuffer);
+            _riskSensorHistory = new SensorSnapshotCircularBufferIterator(sensorHistoryBuffer);
             _riskGraph = new AltitudeSaturationGraph({
                 :width=>_width,
                 :height=>_height,

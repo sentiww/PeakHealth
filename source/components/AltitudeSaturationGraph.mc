@@ -30,7 +30,7 @@ class AltitudeSaturationGraph {
     var showBestSaturation as Lang.Boolean;
     var showWorstSaturation as Lang.Boolean;
 
-    var sensorHistory as CircularBufferIterator;
+    var sensorHistory as SensorSnapshotCircularBufferIterator;
 
     function initialize(options as {
         :width as Lang.Number,
@@ -44,7 +44,7 @@ class AltitudeSaturationGraph {
         :markerSize as Lang.Number,
         :showBestSaturation as Lang.Boolean,
         :showWorstSaturation as Lang.Boolean,
-        :sensorHistory as CircularBufferIterator
+        :sensorHistory as SensorSnapshotCircularBufferIterator
     }) {
         width = options.get(:width);
         height = options.get(:height);
