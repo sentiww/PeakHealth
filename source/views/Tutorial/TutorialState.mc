@@ -1,4 +1,4 @@
-class TutorialState {
+public class TutorialState {
     public enum {
         WELCOME,
         ACTUAL_SATURATION,

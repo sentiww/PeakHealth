@@ -64,7 +64,10 @@ class SensorHandler {
         }
     }
 
-    private function shouldSetCurrent(saturation, altitude) as Lang.Boolean {
+    private function shouldSetCurrent(
+        saturation as Numeric or Null, 
+        altitude as Numeric or Null
+    ) as Boolean {
         if (saturation == null or altitude == null) {
             return false;
         }
@@ -72,7 +75,10 @@ class SensorHandler {
         return true;
     }
 
-    private function shouldAddSensorSnapshot(saturation, altitude) as Lang.Boolean {
+    private function shouldAddSensorSnapshot(
+        saturation as Numeric or Null, 
+        altitude as Numeric or Null
+    ) as Boolean {
         if (saturation == null or altitude == null) {
             return false;
         }
@@ -96,11 +102,11 @@ class SensorHandler {
         return true;
     }
 
-    public function getCurrentSaturation() {
+    public function getCurrentSaturation() as ValueAtMoment {
         return _currentSaturation;
     }
 
-    public function getCurrentAltitude() {
+    public function getCurrentAltitude() as ValueAtMoment {
         return _currentAltitude;
     }
 }

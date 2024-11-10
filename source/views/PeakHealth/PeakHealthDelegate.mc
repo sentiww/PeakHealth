@@ -2,13 +2,13 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 import Toybox.Application.Storage;
 
-class PeakHealthDelegate extends WatchUi.BehaviorDelegate {
+public class PeakHealthDelegate extends WatchUi.BehaviorDelegate {
 
-    function initialize() {
+    public function initialize() {
         BehaviorDelegate.initialize();
     }
 
-    function onMenu() as Boolean {
+    public function onMenu() as Boolean {
         WatchUi.pushView(new MenuView(), new MenuDelegate(), WatchUi.SLIDE_IMMEDIATE);
         return true;
     }

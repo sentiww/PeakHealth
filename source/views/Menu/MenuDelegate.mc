@@ -2,13 +2,13 @@ import Toybox.Application.Storage;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-class MenuDelegate extends WatchUi.Menu2InputDelegate {
+public class MenuDelegate extends WatchUi.Menu2InputDelegate {
 
-    function initialize() {
+    public function initialize() {
         Menu2InputDelegate.initialize();
     }
 
-    function onSelect(item as WatchUi.MenuItem) {
+    public function onSelect(item as WatchUi.MenuItem) as Void {
         var itemId = item.getId();
 
         if (itemId.equals("altitude_window")) {

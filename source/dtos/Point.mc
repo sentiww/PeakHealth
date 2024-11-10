@@ -1,9 +1,16 @@
-class Point {
-    public var x;
-    public var y;
+import Toybox.Lang;
 
-    function initialize(x, y) {
+public class Point {
+
+    public var x as Numeric;
+    public var y as Numeric;
+
+    public function initialize(
+        x as Numeric, 
+        y as Numeric
+    ) {
         self.x = x;
         self.y = y;
     }
+    
 }

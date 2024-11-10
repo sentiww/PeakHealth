@@ -3,8 +3,8 @@ import Toybox.Lang;
 class CircularBufferIterator {
 
     private var _buffer as CircularBuffer;
-    private var _index as Lang.Number;
-    private var _size as Lang.Number;
+    private var _index as Number;
+    private var _size as Number;
 
     public function initialize(buffer as CircularBuffer) {
         _buffer = buffer;
@@ -12,7 +12,7 @@ class CircularBufferIterator {
         _size = buffer.size();
     }
 
-    public function getNext() as Lang.Object {
+    public function getNext() as Object {
         var element = _buffer.get(_index);
 
         _index += 1;
@@ -20,7 +20,7 @@ class CircularBufferIterator {
         return element;
     }
 
-    public function hasMore() as Lang.Boolean {
+    public function hasMore() as Boolean {
         if (_index >= _size) {
             return false;
         } 

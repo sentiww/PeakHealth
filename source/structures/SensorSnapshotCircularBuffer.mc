@@ -2,7 +2,7 @@ import Toybox.Lang;
 
 class SensorSnapshotCircularBuffer extends CircularBuffer {
 
-    public function initialize(size as Lang.Number) {
+    public function initialize(size as Number) {
         CircularBuffer.initialize(size);
     }
 
@@ -10,7 +10,7 @@ class SensorSnapshotCircularBuffer extends CircularBuffer {
         CircularBuffer.add(item);
     }
 
-    public function get(index as Lang.Number) as SensorSnapshot {
+    public function get(index as Number) as SensorSnapshot {
         return CircularBuffer.get(index);
     }
 
@@ -18,11 +18,11 @@ class SensorSnapshotCircularBuffer extends CircularBuffer {
         return CircularBuffer.getLatest();
     }
 
-    public function size() as Lang.Number {
+    public function size() as Number {
         return CircularBuffer.size();
     }
 
-    public function getIndex() as Lang.Number {
+    public function getIndex() as Number {
         return CircularBuffer.getIndex();
     }
 

@@ -10,7 +10,7 @@ import EquationUtils;
 import MathUtils;
 import Toybox.Timer;
 
-class TutorialView extends WatchUi.View {
+public class TutorialView extends WatchUi.View {
 
     private var _state;
 
@@ -27,7 +27,7 @@ class TutorialView extends WatchUi.View {
     private var _width;
     private var _height;
 
-    function initialize() {
+    public function initialize() {
         View.initialize();
 
         _width = null;
@@ -36,14 +36,15 @@ class TutorialView extends WatchUi.View {
         setState(TutorialState.WELCOME);
     }
 
-    function onLayout(dc as Dc) as Void {
+    public function onLayout(dc as Dc) as Void {
+    
     }
 
-    function onShow() as Void {
+    public function onShow() as Void {
+    
     }
 
-    // Update the view
-    function onUpdate(dc as Dc) as Void {
+    public function onUpdate(dc as Dc) as Void {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.clear();
         
@@ -124,13 +125,11 @@ class TutorialView extends WatchUi.View {
         }
     }
 
-    // Called when this View is removed from the screen. Save the
-    // state of this View here. This includes freeing resources from
-    // memory.
-    function onHide() as Void {
+    public function onHide() as Void {
+
     }
 
-    function setState(state) as Void {
+    public function setState(state) as Void {
         _state = state;
         
         if (_state == TutorialState.WELCOME) {

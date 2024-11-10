@@ -2,9 +2,9 @@ import Toybox.WatchUi;
 import Toybox.Lang;
 import Toybox.UserProfile;
 
-class DebugView extends WatchUi.Menu2 {
+public class DebugView extends WatchUi.Menu2 {
 
-    function initialize() {
+    public function initialize() {
         Menu2.initialize({
             :title=>"Debug"
         });
@@ -45,7 +45,7 @@ class DebugView extends WatchUi.Menu2 {
         }
     }
 
-    function getCurrentAltitudeText() {
+    public function getCurrentAltitudeText() as String {
         var sensorHandler = SensorHandler.getInstance();
 
         var currentAltitude = sensorHandler.getCurrentAltitude();
@@ -53,7 +53,7 @@ class DebugView extends WatchUi.Menu2 {
         return currentAltitude.value + "m, at " + MomentUtils.toHumanReadable(currentAltitude.moment);
     }
 
-    function getCurrentSaturationText() {
+    public function getCurrentSaturationText() as String {
         var sensorHandler = SensorHandler.getInstance();
 
         var currentSaturation = sensorHandler.getCurrentSaturation();
@@ -61,7 +61,7 @@ class DebugView extends WatchUi.Menu2 {
         return currentSaturation.value + "%, at " + MomentUtils.toHumanReadable(currentSaturation.moment);
     }
 
-    function getUserGenderText() {
+    public function getUserGenderText() as String {
         var userProfile = UserProfile.getProfile();
 
         if (userProfile == null or userProfile.gender == null) {

@@ -10,47 +10,48 @@ import EquationUtils;
 import MathUtils;
 import Toybox.Timer;
 
-class PeakHealthView extends WatchUi.View {
+public class PeakHealthView extends WatchUi.View {
 
-    hidden var oxygenSaturationText;
-    hidden var aosText;
-    hidden var graph;
-    hidden var currentAltitude;
-    hidden var currentSaturation;
-    hidden var window as Lang.Number;
-    hidden var showBestSaturation as Lang.Boolean;
-    hidden var showWorstSaturation as Lang.Boolean;
-    hidden var timer as Timer;
+    private var _oxygenSaturationText;
+    private var _aosText;
+    private var _graph;
+    private var _currentAltitude;
+    private var _currentSaturation;
+    private var _window as Number;
+    private var _showBestSaturation as Boolean;
+    private var _showWorstSaturation as Boolean;
+    private var _timer as Timer;
 
-    function initialize() {
+    public function initialize() {
         View.initialize();
 
-        currentAltitude = 0;
-        currentSaturation = EquationUtils.getLinearTheoreticalSaturation(currentAltitude);
+        _currentAltitude = 0;
+        _currentSaturation = EquationUtils.getLinearTheoreticalSaturation(_currentAltitude);
 
-        showBestSaturation = Storage.getValue("show_best_saturation");
-        if (showBestSaturation == null) {
-            showBestSaturation = true;
+        _showBestSaturation = Storage.getValue("show_best_saturation");
+        if (_showBestSaturation == null) {
+            _showBestSaturation = true;
         }
 
-        showWorstSaturation = Storage.getValue("show_worst_saturation");
-        if (showWorstSaturation == null) {
-            showWorstSaturation = true;
+        _showWorstSaturation = Storage.getValue("show_worst_saturation");
+        if (_showWorstSaturation == null) {
+            _showWorstSaturation = true;
         }
 
-        window = Storage.getValue("graph_altitude_window");
-        if (window == null) {
-            window = 1000;
+        _window = Storage.getValue("graph_altitude_window");
+        if (_window == null) {
+            _window = 1000;
         }
 
-        timer = new Timer.Timer();
+        _timer = new Timer.Timer();
     }
 
-    function onLayout(dc as Dc) as Void {
+    public function onLayout(dc as Dc) as Void {
+    
     }
 
-    function onShow() as Void {
-        timer.start(method(:timerCallback), 5000, true);
+    public function onShow() as Void {
+        _timer.start(method(:timerCallback), 5000, true);
 
         var shownTutorial = Storage.getValue("shown_tutorial");
         if (shownTutorial == null or !shownTutorial) {
@@ -59,7 +60,7 @@ class PeakHealthView extends WatchUi.View {
             Storage.setValue("shown_tutorial", true);
         }
 
-        oxygenSaturationText = new WatchUi.Text({
+        _oxygenSaturationText = new WatchUi.Text({
             :text=>"000",
             :color=>Graphics.COLOR_RED,
             :font=>Graphics.FONT_MEDIUM,
@@ -67,7 +68,7 @@ class PeakHealthView extends WatchUi.View {
             :locY=>WatchUi.LAYOUT_VALIGN_TOP
         });
 
-        aosText = new WatchUi.Text({
+        _aosText = new WatchUi.Text({
             :text=>"000",
             :color=>Graphics.COLOR_BLUE,
             :font=>Graphics.FONT_MEDIUM,
@@ -75,72 +76,66 @@ class PeakHealthView extends WatchUi.View {
             :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM
         });
 
-        showBestSaturation = Storage.getValue("show_best_saturation");
-        if (showBestSaturation == null) {
-            showBestSaturation = true;
+        _showBestSaturation = Storage.getValue("show_best_saturation");
+        if (_showBestSaturation == null) {
+            _showBestSaturation = true;
         }
 
-        showWorstSaturation = Storage.getValue("show_worst_saturation");
-        if (showWorstSaturation == null) {
-            showWorstSaturation = true;
+        _showWorstSaturation = Storage.getValue("show_worst_saturation");
+        if (_showWorstSaturation == null) {
+            _showWorstSaturation = true;
         }
 
-        window = Storage.getValue("graph_altitude_window");
-        if (window == null) {
-            window = 1000;
+        _window = Storage.getValue("graph_altitude_window");
+        if (_window == null) {
+            _window = 1000;
         }
     }
 
-    // Update the view
     function onUpdate(dc as Dc) as Void {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.clear();
 
-        oxygenSaturationText.draw(dc);
-        aosText.draw(dc);
+        _oxygenSaturationText.draw(dc);
+        _aosText.draw(dc);
 
         dc.setAntiAlias(true);
 
         var sensorHandler = SensorHandler.getInstance();
-        graph = new AltitudeSaturationGraph({
+        _graph = new AltitudeSaturationGraph({
             :width=>dc.getWidth(),
             :height=>dc.getHeight(),
             :paddingX=>25,
             :paddingTop=>50,
             :paddingBottom=>50,
-            //:currentAltitude=>1000,
-            //:currentSaturation=>95,
-            :currentAltitude=>currentAltitude,
-            :currentSaturation=>currentSaturation,
-            :altitudeWindow=>window,
+            :currentAltitude=>_currentAltitude,
+            :currentSaturation=>_currentSaturation,
+            :altitudeWindow=>_window,
             :markerSize=>4,
-            :showBestSaturation=>showBestSaturation,
-            :showWorstSaturation=>showWorstSaturation,
+            :showBestSaturation=>_showBestSaturation,
+            :showWorstSaturation=>_showWorstSaturation,
             :sensorHistory=>sensorHandler.getSensorHistoryIterator()
         });
-        graph.draw(dc);
+        _graph.draw(dc);
     }
 
-    // Called when this View is removed from the screen. Save the
-    // state of this View here. This includes freeing resources from
-    // memory.
-    function onHide() as Void {
-        timer.stop();
+    public function onHide() as Void {
+        _timer.stop();
     }
 
-    function timerCallback() {
+    public function timerCallback() as Void {
         var sensorHandler = SensorHandler.getInstance();
 
-        currentSaturation = sensorHandler.getCurrentSaturation().value;
-        currentAltitude = sensorHandler.getCurrentAltitude().value;
+        _currentSaturation = sensorHandler.getCurrentSaturation().value;
+        _currentAltitude = sensorHandler.getCurrentAltitude().value;
 
         System.println("Got sensor update");
 
-        var aos = EquationUtils.getLinearTheoreticalSaturation(currentAltitude);
+        var aos = EquationUtils.getLinearTheoreticalSaturation(_currentAltitude);
         aos = MathUtils.clamp(aos, 0, 100);
         
-        oxygenSaturationText.setText(currentSaturation.format("%02d"));
-        aosText.setText(aos.format("%02d"));
+        _oxygenSaturationText.setText(_currentSaturation.format("%02d"));
+        _aosText.setText(aos.format("%02d"));
 
         WatchUi.requestUpdate();
     }

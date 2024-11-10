@@ -1,9 +1,9 @@
 import Toybox.WatchUi;
 import Toybox.Lang;
 
-class MenuView extends WatchUi.Menu2 {
+public class MenuView extends WatchUi.Menu2 {
 
-    function initialize() {
+    public function initialize() {
         Menu2.initialize({
             :title=>"Settings"
         });

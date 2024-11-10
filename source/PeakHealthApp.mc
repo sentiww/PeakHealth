@@ -4,13 +4,13 @@ import Toybox.WatchUi;
 import Toybox.Sensor;
 
 (:background)
-class PeakHealthApp extends Application.AppBase {
+public class PeakHealthApp extends Application.AppBase {
 
-    hidden var sensorHandler as SensorHandler;
+    private var sensorHandler as SensorHandler;
 
-    const fiveMinutes = new Time.Duration(5 * 60);
+    private const fiveMinutes = new Time.Duration(5 * 60);
 
-    function initialize() {
+    public function initialize() {
         AppBase.initialize();
 
         if (Toybox.System has :ServiceDelegate){
@@ -24,21 +24,23 @@ class PeakHealthApp extends Application.AppBase {
         sensorHandler = SensorHandler.getInstance();
     }
 
-    function onStart(state as Dictionary?) as Void {
+    public function onStart(state as Dictionary?) as Void {
+    
     }
 
-    function onStop(state as Dictionary?) as Void {
+    public function onStop(state as Dictionary?) as Void {
+    
     }
 
-    function getInitialView() as [Views] or [Views, InputDelegates] {
+    public function getInitialView() as [Views] or [Views, InputDelegates] {
         return [ new PeakHealthView(), new PeakHealthDelegate() ];
     }
     
-    function getServiceDelegate() {
+    public function getServiceDelegate() {
         return [new BackgroundServiceDelegate()];
     }
 }
 
-function getApp() as PeakHealthApp {
+public function getApp() as PeakHealthApp {
     return Application.getApp() as PeakHealthApp;
 }

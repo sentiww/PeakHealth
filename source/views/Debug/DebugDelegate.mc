@@ -2,15 +2,14 @@ import Toybox.Application.Storage;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-class DebugDelegate extends WatchUi.Menu2InputDelegate {
+public class DebugDelegate extends WatchUi.Menu2InputDelegate {
 
-    function initialize() {
+    public function initialize() {
         Menu2InputDelegate.initialize();
     }
 
-    function onSelect(item as WatchUi.MenuItem) {
-        var itemId = item.getId();
-
+    public function onSelect(item as WatchUi.MenuItem) as Void {
+        // var itemId = item.getId();
     }
 
 }

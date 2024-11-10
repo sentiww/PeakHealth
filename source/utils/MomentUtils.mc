@@ -5,7 +5,7 @@ import Toybox.Time.Gregorian;
 
 public module MomentUtils {
 
-    public function toHumanReadable(moment as Moment) {
+    public function toHumanReadable(moment as Moment) as String {
         var offset = moment.value();
 
         offset -= System.getClockTime().timeZoneOffset;

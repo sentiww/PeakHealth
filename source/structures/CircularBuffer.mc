@@ -2,17 +2,17 @@ import Toybox.Lang;
 
 class CircularBuffer {
 
-    private var _size as Lang.Number;
-    private var _array as Lang.Array;
-    private var _index as Lang.Number;
+    private var _size as Number;
+    private var _array as Array<Object>;
+    private var _index as Number;
 
-    function initialize(size) {
+    public function initialize(size as Number) {
         _size = size;
         _array = new [size];
         _index = size;
     }
 
-    function add(item) {
+    public function add(item as Object) as Void {
         if (_index == _array.size()) {
             _index = 0;
         }
@@ -21,19 +21,19 @@ class CircularBuffer {
         _index += 1;
     }
 
-    function get(index) {
+    public function get(index as Number) as Object {
         return _array[index];
     }
 
-    function getLatest() {
+    public function getLatest() as Object {
         return _array[_index - 1];
     }
 
-    function size() {
+    public function size() as Number {
         return _size;
     }
 
-    function getIndex() {
+    public function getIndex() as Number {
         return _index;
     }
 

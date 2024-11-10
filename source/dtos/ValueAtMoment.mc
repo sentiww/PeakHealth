@@ -1,9 +1,17 @@
-class ValueAtMoment {
-    public var moment;
-    public var value;
+import Toybox.Lang;
+import Toybox.Time;
 
-    function initialize(moment, value) {
+public class ValueAtMoment {
+
+    public var moment as Moment;
+    public var value as Numeric;
+
+    function initialize(
+        moment as Moment, 
+        value as Numeric
+    ) {
         self.moment = moment;
         self.value = value;
     }
+
 }

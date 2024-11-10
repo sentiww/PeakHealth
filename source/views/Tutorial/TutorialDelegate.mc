@@ -1,24 +1,24 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-class TutorialDelegate extends WatchUi.BehaviorDelegate {
+public class TutorialDelegate extends WatchUi.BehaviorDelegate {
 
     private var _state;
     private var _tutorialView as TutorialView;
 
-    function initialize(tutorialView as TutorialView) {
+    public function initialize(tutorialView as TutorialView) {
         BehaviorDelegate.initialize();
 
         _state = TutorialState.WELCOME;
         _tutorialView = tutorialView;
     }
 
-    function onMenu() as Boolean {
+    public function onMenu() as Boolean {
         WatchUi.pushView(new MenuView(), new MenuDelegate(), WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
 
-    function onSelect() as Boolean {
+    public function onSelect() as Boolean {
         System.println(_state);
 
         if (_state == TutorialState.WELCOME) {
@@ -103,7 +103,7 @@ class TutorialDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
-    function onBack() as Boolean {
+    public function onBack() as Boolean {
         if (_state == TutorialState.WELCOME) {
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         }

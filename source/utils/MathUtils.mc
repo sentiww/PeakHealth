@@ -4,10 +4,10 @@ import Toybox.System;
 public module MathUtils {
 
     public function clamp(
-        value as Lang.Number or Lang.Float,
-        min as Lang.Number or Lang.Float,
-        max as Lang.Number or Lang.Float
-    ) as Lang.Number or Lang.Float {
+        value as Numeric,
+        min as Numeric,
+        max as Numeric
+    ) as Numeric {
         if (value < min) {
             return min;
         }
@@ -20,9 +20,9 @@ public module MathUtils {
     }
 
     public function max(
-        first as Lang.Number or Lang.Float, 
-        second as Lang.Number or Lang.Float
-    ) as Lang.Number or Lang.Float {
+        first as Numeric, 
+        second as Numeric
+    ) as Numeric {
         if (first > second) {
             return first;
         }
@@ -31,9 +31,9 @@ public module MathUtils {
     }
 
     public function min(
-        first as Lang.Number or Lang.Float, 
-        second as Lang.Number or Lang.Float
-    ) as Lang.Number or Lang.Float {
+        first as Numeric, 
+        second as Numeric
+    ) as Numeric {
         if (first < second) {
             return first;
         }
@@ -42,10 +42,10 @@ public module MathUtils {
     }  
 
     public function isInRange(
-        value as Lang.Number or Lang.Float,
-        min as Lang.Number or Lang.Float,
-        max as Lang.Number or Lang.Float
-    ) as Lang.Boolean {
+        value as Numeric,
+        min as Numeric,
+        max as Numeric
+    ) as Boolean {
         return min < value and value < max;
     }
 
@@ -53,7 +53,7 @@ public module MathUtils {
         topLeft as Point,
         bottomRight as Point,
         point as Point
-    ) as Lang.Boolean {
+    ) as Boolean {
         return topLeft.x < point.x and 
                topLeft.y + 1 < point.y and
                bottomRight.x > point.x and
@@ -61,8 +61,8 @@ public module MathUtils {
     } 
 
     public function sum(
-        values as Array<Lang.Numeric>
-    ) as Lang.Numeric {
+        values as Array<Numeric>
+    ) as Numeric {
         var accumulator = 0;
 
         for (var i = 0; i < values.size(); i++) {
